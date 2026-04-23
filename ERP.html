@@ -2,128 +2,119 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>生管/物管決策支援系統展示</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <style>
-        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #f4f7f6; padding: 20px; }
+        body { font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; background-color: #f4f7f6; padding: 20px; line-height: 1.6; }
         .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .header { border-left: 5px solid #2c3e50; padding-left: 15px; margin-bottom: 25px; }
-        .control-panel { background: #eef2f3; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; }
+        .control-panel { background: #eef2f3; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
         .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.9em; font-weight: bold; }
-        .danger { background: #ff7675; color: white; }
-        .safe { background: #55efc4; color: #2d3436; }
+        .danger { background: #ff7675 !important; color: white; }
+        .safe { background: #55efc4 !important; color: #2d3436; }
+        canvas { max-height: 400px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>智慧生產物料預警系統 <small style="font-size: 0.5em; color: #7f8c8d;">(Demo for MC/PC Role)</small></h1>
-        <p>本工具演示如何透過數據視覺化，協助生管提前 7 天識別斷料風險。</p>
+        <h1>智慧生產物料預警系統 <small style="font-size: 0.5em; color: #7f8c8d;">(Demo for MC/PC/OM Role)</small></h1>
+        <p>本工具演示如何透過數據視覺化，協助生管提前識別斷料風險，優化 SAP/ERP 決策效率。</p>
     </div>
 
     <div class="control-panel">
         <div>
             <label>模擬訂單波動 (+/- %): </label>
-            <input type="range" id="demandSlider" min="-50" max="100" value="0" oninput="updateChart()">
+            <input type="range" id="demandSlider" min="-50" max="100" value="0">
             <span id="demandVal">0%</span>
         </div>
         <div id="statusIndicator">
-            狀態：<span class="status-badge safe">庫存充足</span>
+            狀態：<span class="status-badge safe">✅ 庫存充足</span>
         </div>
     </div>
 
     <canvas id="inventoryChart"></canvas>
 
-    <div style="margin-top: 20px; color: #636e72; font-size: 0.9em;">
-        <strong>技術重點：</strong> 
+    <div style="margin-top: 20px; color: #636e72; font-size: 0.9em; border-top: 1px solid #eee; pt: 15px;">
+        <p><strong>技術說明：</strong></p>
         <ul>
-            <li><strong>數據膠水：</strong> 整合 ERP 訂單 (Demand) 與 採購單 (Supply) 的異質數據。</li>
-            <li><strong>動態閾值：</strong> 自動計算 Project On-Hand，並對負值區間進行顏色標記 (Visual Management)。</li>
+            <li><strong>自動化運算：</strong> 實作生管核心 ATP (Available To Promise) 邏輯。</li>
+            <li><strong>視覺化管理：</strong> 透過 Chart.js 填充功能，自動標定預計斷料區間（紅色區塊）。</li>
         </ul>
     </div>
 </div>
 
 <script>
-// 1. 基礎數據 (模擬從 SAP/ERP 匯出)
-const baseLabels = ['05/01', '05/02', '05/03', '05/04', '05/05', '05/06', '05/07'];
-const baseDemand = [20, 25, 45, 30, 40, 20, 15]; // 每日訂單需求
-const baseSupply = [0, 0, 80, 0, 0, 50, 0];      // 預計採購入庫
-let initialStock = 40;
+document.addEventListener('DOMContentLoaded', function() {
+    const baseLabels = ['05/01', '05/02', '05/03', '05/04', '05/05', '05/06', '05/07'];
+    const baseDemand = [20, 25, 45, 30, 40, 20, 15]; 
+    const baseSupply = [0, 0, 80, 0, 0, 50, 0];      
+    let initialStock = 40;
 
-const ctx = document.getElementById('inventoryChart').getContext('2d');
-let myChart;
-
-function calculateStock(demandMod) {
-    let stockLevels = [];
-    let current = initialStock;
-    let hasShortage = false;
-
-    for (let i = 0; i < baseDemand.length; i++) {
-        let modDemand = baseDemand[i] * (1 + demandMod / 100);
-        current = current + baseSupply[i] - modDemand;
-        stockLevels.push(current.toFixed(1));
-        if (current < 0) hasShortage = true;
-    }
-    return { stockLevels, hasShortage };
-}
-
-function updateChart() {
-    const mod = document.getElementById('demandSlider').value;
-    document.getElementById('demandVal').innerText = mod + "%";
+    const ctx = document.getElementById('inventoryChart').getContext('2d');
     
-    const { stockLevels, hasShortage } = calculateStock(mod);
-    
-    // 更新狀態燈
-    const indicator = document.getElementById('statusIndicator');
-    if (hasShortage) {
-        indicator.innerHTML = '狀態：<span class="status-badge danger">⚠️ 發現缺料風險</span>';
-    } else {
-        indicator.innerHTML = '狀態：<span class="status-badge safe">✅ 庫存安全</span>';
+    function calculateStock(demandMod) {
+        let stockLevels = [];
+        let current = initialStock;
+        let hasShortage = false;
+
+        for (let i = 0; i < baseDemand.length; i++) {
+            let modDemand = baseDemand[i] * (1 + demandMod / 100);
+            current = current + baseSupply[i] - modDemand;
+            stockLevels.push(current.toFixed(1));
+            if (current < 0) hasShortage = true;
+        }
+        return { stockLevels, hasShortage };
     }
 
-    myChart.data.datasets[0].data = stockLevels;
-    myChart.update();
-}
+    const initialData = calculateStock(0);
 
-// 2. 初始化 Chart.js
-myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: baseLabels,
-        datasets: [{
-            label: '預計庫存水位 (Projected Available)',
-            data: calculateStock(0).stockLevels,
-            borderColor: '#2980b9',
-            backgroundColor: 'rgba(41, 128, 185, 0.1)',
-            fill: {
-                target: 'origin',
-                above: 'rgba(85, 239, 196, 0.3)', // 高於 0 顯示綠色
-                below: 'rgba(255, 118, 117, 0.4)'  // 低於 0 顯示紅色（斷料區）
-            },
-            tension: 0.3,
-            pointRadius: 5
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: { position: 'top' },
-            tooltip: {
-                callbacks: {
-                    afterBody: (context) => {
-                        return context[0].parsed.y < 0 ? '建議：提前催料或調整排程' : '';
-                    }
-                }
-            }
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: baseLabels,
+            datasets: [{
+                label: '預計庫存水位 (Projected Available)',
+                data: initialData.stockLevels,
+                borderColor: '#2980b9',
+                backgroundColor: 'rgba(41, 128, 185, 0.1)',
+                fill: {
+                    target: 'origin',
+                    above: 'rgba(85, 239, 196, 0.3)',
+                    below: 'rgba(255, 118, 117, 0.4)' 
+                },
+                tension: 0.3,
+                pointRadius: 5
+            }]
         },
-        scales: {
-            y: {
-                title: { display: true, text: '數量 (PCS)' },
-                grid: { color: '#dfe6e9' }
+        options: {
+            responsive: true,
+            scales: {
+                y: { title: { display: true, text: '數量 (PCS)' } }
             }
         }
-    }
+    });
+
+    // 監聽滑桿
+    const slider = document.getElementById('demandSlider');
+    slider.addEventListener('input', function() {
+        const mod = this.value;
+        document.getElementById('demandVal').innerText = mod + "%";
+        
+        const { stockLevels, hasShortage } = calculateStock(mod);
+        
+        const indicator = document.getElementById('statusIndicator');
+        if (hasShortage) {
+            indicator.innerHTML = '狀態：<span class="status-badge danger">⚠️ 發現缺料風險</span>';
+        } else {
+            indicator.innerHTML = '狀態：<span class="status-badge safe">✅ 庫存安全</span>';
+        }
+
+        myChart.data.datasets[0].data = stockLevels;
+        myChart.update();
+    });
 });
 </script>
 </body>
