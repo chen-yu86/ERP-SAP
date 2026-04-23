@@ -3,58 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>生管/物管決策支援系統展示</title>
+    <title>智慧生管物料預警系統 | Demo</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <style>
-        body { font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; background-color: #f4f7f6; padding: 20px; line-height: 1.6; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .header { border-left: 5px solid #2c3e50; padding-left: 15px; margin-bottom: 25px; }
-        .control-panel { background: #eef2f3; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
-        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.9em; font-weight: bold; }
-        .danger { background: #ff7675 !important; color: white; }
-        .safe { background: #55efc4 !important; color: #2d3436; }
-        canvas { max-height: 400px; }
+        :root {
+            --primary-dark: #2c3e50;
+            --danger-red: #ff7675;
+            --safe-green: #55efc4;
+            --bg-gray: #f4f7f6;
+        }
+        body { font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; background-color: var(--bg-gray); padding: 20px; line-height: 1.6; }
+        .container { max-width: 950px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        .header { border-left: 6px solid var(--primary-dark); padding-left: 20px; margin-bottom: 30px; }
+        .header h1 { margin: 0; color: var(--primary-dark); font-size: 1.8rem; }
+        .control-panel { background: #eef2f3; padding: 20px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 30px; align-items: center; flex-wrap: wrap; border: 1px solid #dcdde1; }
+        .status-badge { padding: 6px 16px; border-radius: 20px; font-size: 0.95em; font-weight: bold; transition: all 0.3s; }
+        .danger { background: var(--danger-red) !important; color: white; box-shadow: 0 2px 8px rgba(255,118,117,0.4); }
+        .safe { background: var(--safe-green) !important; color: #2d3436; }
+        .info-section { margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee; color: #636e72; }
+        .info-section ul { padding-left: 20px; }
+        .info-section li { margin-bottom: 8px; }
+        input[type=range] { cursor: pointer; width: 200px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>智慧生產物料預警系統 <small style="font-size: 0.5em; color: #7f8c8d;">(Demo for MC/PC/OM Role)</small></h1>
-        <p>本工具演示如何透過數據視覺化，協助生管提前識別斷料風險，優化 SAP/ERP 決策效率。</p>
+        <h1>智慧生產物料預警系統 <small style="font-size: 0.5em; color: #7f8c8d; vertical-align: middle;">(Professional Demo for MC/PC/OM)</small></h1>
+        <p>實踐數據驅動管理：整合訂單與供應鏈數據，實現動態斷料預警 (Visual Management)。</p>
     </div>
 
     <div class="control-panel">
         <div>
-            <label>模擬訂單波動 (+/- %): </label>
-            <input type="range" id="demandSlider" min="-50" max="100" value="0">
-            <span id="demandVal">0%</span>
+            <label style="font-weight: bold;">模擬訂單需求波動: </label>
+            <input type="range" id="demandSlider" min="-50" max="100" value="0" step="1">
+            <strong id="demandVal" style="color: #2980b9; width: 45px; display: inline-block; text-align: center;">0%</strong>
         </div>
         <div id="statusIndicator">
-            狀態：<span class="status-badge safe">✅ 庫存充足</span>
+            即時狀態：<span class="status-badge safe">✅ 庫存水位充足</span>
         </div>
     </div>
 
-    <canvas id="inventoryChart"></canvas>
+    <div style="position: relative; height:400px;">
+        <canvas id="inventoryChart"></canvas>
+    </div>
 
-    <div style="margin-top: 20px; color: #636e72; font-size: 0.9em; border-top: 1px solid #eee; pt: 15px;">
-        <p><strong>技術說明：</strong></p>
+    <div class="info-section">
+        <p><strong>💡 系統逻辑與技術亮點 (面試說明要點)：</strong></p>
         <ul>
-            <li><strong>自動化運算：</strong> 實作生管核心 ATP (Available To Promise) 邏輯。</li>
-            <li><strong>視覺化管理：</strong> 透過 Chart.js 填充功能，自動標定預計斷料區間（紅色區塊）。</li>
+            <li><strong>動態 ATP 運算：</strong> 模擬工廠每日 Project On-Hand 水位，實作「預計可用量」邏輯而非僅呈現靜態庫存。</li>
+            <li><strong>壓力測試模擬：</strong> 透過滑桿控制項（Step=1%）即時反應市場波動對產線料件供應的衝擊。</li>
+            <li><strong>自動化預警視覺化：</strong> 當預估水位低於 0 或安全基準時，圖表自動渲染紅色區塊，落實「例外管理」。</li>
         </ul>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // 1. 定義符合工廠規模的基準數據
     const baseLabels = ['05/01', '05/02', '05/03', '05/04', '05/05', '05/06', '05/07'];
-    const baseDemand = [20, 25, 45, 30, 40, 20, 15]; 
-    const baseSupply = [0, 0, 80, 0, 0, 50, 0];      
-    let initialStock = 40;
+    const baseDemand = [120, 150, 280, 180, 250, 140, 110]; // 模擬每日訂單需求
+    const baseSupply = [0, 0, 600, 0, 0, 400, 0];          // 模擬預計採購入庫 (Supply Plan)
+    let initialStock = 350;                                // 初始庫存設定
 
     const ctx = document.getElementById('inventoryChart').getContext('2d');
     
+    // 2. 核心運算邏輯 (ATP Calculation)
     function calculateStock(demandMod) {
         let stockLevels = [];
         let current = initialStock;
@@ -63,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
         for (let i = 0; i < baseDemand.length; i++) {
             let modDemand = baseDemand[i] * (1 + demandMod / 100);
             current = current + baseSupply[i] - modDemand;
-            stockLevels.push(current.toFixed(1));
+            stockLevels.push(current.toFixed(0)); // 庫存取整數
             if (current < 0) hasShortage = true;
         }
         return { stockLevels, hasShortage };
@@ -71,49 +86,72 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const initialData = calculateStock(0);
 
+    // 3. 繪製圖表
     const myChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: baseLabels,
             datasets: [{
-                label: '預計庫存水位 (Projected Available)',
+                label: '預計可用庫存水位 (Projected Available Balance)',
                 data: initialData.stockLevels,
                 borderColor: '#2980b9',
                 backgroundColor: 'rgba(41, 128, 185, 0.1)',
+                borderWidth: 3,
                 fill: {
                     target: 'origin',
-                    above: 'rgba(85, 239, 196, 0.3)',
-                    below: 'rgba(255, 118, 117, 0.4)' 
+                    above: 'rgba(85, 239, 196, 0.3)', // 安全區綠色
+                    below: 'rgba(255, 118, 117, 0.4)'  // 斷料區紅色
                 },
                 tension: 0.3,
-                pointRadius: 5
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#fff'
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
-                y: { title: { display: true, text: '數量 (PCS)' } }
+                y: { 
+                    title: { display: true, text: '數量 (Units)', font: { weight: 'bold' } },
+                    grid: { color: '#ecf0f1' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            },
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            let val = context.parsed.y;
+                            return ` 預估庫存: ${val} ${val < 0 ? ' (⚠️ 缺料)' : ''}`;
+                        }
+                    }
+                }
             }
         }
     });
 
-    // 監聽滑桿
+    // 4. 監聽滑桿變動
     const slider = document.getElementById('demandSlider');
     slider.addEventListener('input', function() {
-        const mod = this.value;
-        document.getElementById('demandVal').innerText = mod + "%";
+        const mod = parseInt(this.value);
+        document.getElementById('demandVal').innerText = (mod > 0 ? '+' : '') + mod + "%";
         
         const { stockLevels, hasShortage } = calculateStock(mod);
         
         const indicator = document.getElementById('statusIndicator');
         if (hasShortage) {
-            indicator.innerHTML = '狀態：<span class="status-badge danger">⚠️ 發現缺料風險</span>';
+            indicator.innerHTML = '即時狀態：<span class="status-badge danger">⚠️ 發現斷料風險，請調整排程</span>';
         } else {
-            indicator.innerHTML = '狀態：<span class="status-badge safe">✅ 庫存安全</span>';
+            indicator.innerHTML = '即時狀態：<span class="status-badge safe">✅ 庫存水位充足</span>';
         }
 
         myChart.data.datasets[0].data = stockLevels;
-        myChart.update();
+        myChart.update('none'); // 使用 'none' 模式讓滑動更順暢
     });
 });
 </script>
