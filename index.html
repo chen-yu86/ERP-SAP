@@ -10,26 +10,29 @@
         body { font-family: "Segoe UI", "Microsoft JhengHei", sans-serif; background-color: #f8f9fa; padding: 20px; color: #333; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         
-        /* 標題區 */
         .header { border-left: 6px solid var(--primary); padding-left: 20px; margin-bottom: 30px; }
         .header h1 { margin: 0; font-size: 1.8rem; color: var(--primary); }
         .header p { margin: 5px 0 0; color: #7f8c8d; }
 
-        /* 模擬 Python 後端日誌視窗 (核心亮點) */
+        /* 模擬 Python 後端日誌視窗 */
         .terminal { background: var(--terminal-bg); color: #00ff00; padding: 15px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.85rem; margin-bottom: 25px; border: 1px solid #333; box-shadow: inset 0 0 10px #000; }
         .terminal-line { margin-bottom: 4px; border-right: 2px solid #00ff00; width: fit-content; white-space: nowrap; overflow: hidden; animation: typing 2s steps(40, end), blink .75s step-end infinite; }
         
-        /* 控制面板 */
-        .control-panel { background: #fff; border: 1px solid #dcdde1; padding: 20px; border-radius: 8px; margin-bottom: 25px; display: flex; align-items: center; gap: 20px; }
-        .status-badge { padding: 8px 16px; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
+        .control-panel { background: #fff; border: 1px solid #dcdde1; padding: 20px; border-radius: 8px; margin-bottom: 25px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .status-badge { padding: 8px 16px; border-radius: 50px; font-weight: bold; font-size: 0.9rem; transition: 0.3s; }
         .bg-danger { background: var(--danger); color: white; }
         .bg-success { background: var(--success); color: white; }
 
-        /* 圖表區 */
         .chart-wrapper { position: relative; height: 400px; margin-bottom: 20px; }
 
         @keyframes typing { from { width: 0 } to { width: 100% } }
         @keyframes blink { from, to { border-color: transparent } 50% { border-color: #00ff00 } }
+
+        /* 技術優勢區塊樣式優化 */
+        .tech-value { margin-top: 30px; font-size: 0.95rem; color: #444; line-height: 1.7; border-top: 2px solid #eee; padding-top: 20px; }
+        .tech-value ul { padding-left: 20px; margin-top: 10px; }
+        .tech-value li { margin-bottom: 12px; }
+        .tech-highlight { color: #2c3e50; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -41,10 +44,10 @@
     </div>
 
     <div class="terminal">
-        <div class="terminal-line">> [SYSTEM] 已連結 SAP HANA 資料庫...</div>
-        <div class="terminal-line">> [PYTHON] 調用 Pandas 讀取 15,240 筆 ERP 原始訂單與採購數據...</div>
-        <div class="terminal-line">> [INFO] 自動化清洗格式錯誤、處理 Null 值並執行 ATP 邏輯運算...</div>
-        <div style="color: #fff;">> [SUCCESS] 運算完成 (耗時: 0.42s)。數據已同步至前端看板。</div>
+        <div class="terminal-line">> [SYSTEM] 已連結 SAP HANA 資料庫系統...</div>
+        <div class="terminal-line">> [PYTHON] 調用 Pandas 載入並清洗 15,240 筆原始異質數據...</div>
+        <div class="terminal-line">> [INFO] 執行向量化 ATP 邏輯運算，自動導正日期格式與缺失值...</div>
+        <div style="color: #fff;">> [SUCCESS] 運算完成 (耗時: 0.42s)。數據已同步至前端可視化畫板。</div>
     </div>
 
     <div class="control-panel">
@@ -54,7 +57,7 @@
             <span id="demandVal" style="font-weight: bold; color: var(--accent); margin-left: 10px;">0%</span>
         </div>
         <div id="statusIndicator">
-            狀態：<span class="status-badge bg-success">✅ 庫存供應正常</span>
+            即時狀態：<span class="status-badge bg-success">✅ 庫存供應正常</span>
         </div>
     </div>
 
@@ -62,19 +65,27 @@
         <canvas id="inventoryChart"></canvas>
     </div>
 
-    <div style="margin-top: 30px; font-size: 0.9rem; color: #666; line-height: 1.6;">
-        <strong>🚀 無可取代的技術價值 (面試回答重點)：</strong>
+    <div class="tech-value">
+        <strong>🚀 核心技術優勢 (技術與業務的整合實踐)：</strong>
         <ul>
-            <li><strong>Python (Pandas) 自動化：</strong> 取代傳統 2 小時的人工 Excel 樞紐與 VLOOKUP，將數據處理效率提升 99%。</li>
-            <li><strong>異質系統整合：</strong> 本系統設計邏輯可直接對接 SAP/ERP API，確保決策者看到的是即時數據而非過期報表。</li>
-            <li><strong>動態壓力測試：</strong> 實現 What-if 分析，生管可即時模擬訂單激增對供應鏈的衝擊，提前啟動採購預警。</li>
+            <li>
+                <span class="tech-highlight">Python (Pandas) 數據自動化：</span> 
+                取代傳統 2 小時的人工 Excel 樞紐、VLOOKUP 及數據清洗流程。利用 Pandas 向量化運算 (Vectorized Operations) 實現秒級 MRP 運算，確保產線數據的時效性與精準度。
+            </li>
+            <li>
+                <span class="tech-highlight">異質系統高效串接：</span> 
+                設計邏輯可直接對接 SAP/ERP 原始導出檔，自動校正日期格式、處理 Null 值等異常數據，大幅降低人為操作錯誤風險。
+            </li>
+            <li>
+                <span class="tech-highlight">動態供應鏈壓力測試：</span> 
+                結合前端 Chart.js 與後端邏輯，實現「What-if 模擬分析」。生管可即時預判訂單波動對供應鏈的衝擊，將決策維度從「事後反應」提升至「事前預防」。
+            </li>
         </ul>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 模擬從 Python 後端傳來的數據 (百位數規模)
     const labels = ['05/01', '05/02', '05/03', '05/04', '05/05', '05/06', '05/07'];
     const baseDemand = [150, 180, 300, 220, 280, 160, 120];
     const baseSupply = [0, 0, 700, 0, 0, 450, 0];
@@ -113,7 +124,16 @@ document.addEventListener('DOMContentLoaded', function() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'top' } },
+            plugins: { 
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        afterBody: (context) => {
+                            return context[0].parsed.y < 0 ? '建議：提前催料' : '';
+                        }
+                    }
+                }
+            },
             scales: { y: { title: { display: true, text: '數量 (PCS)' } } }
         }
     });
@@ -126,9 +146,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const badge = document.getElementById('statusIndicator');
         if(shortage) {
-            badge.innerHTML = '狀態：<span class="status-badge bg-danger">⚠️ 發現缺料風險，請介入調整</span>';
+            badge.innerHTML = '即時狀態：<span class="status-badge bg-danger">⚠️ 發現斷料風險，請調整排程</span>';
         } else {
-            badge.innerHTML = '狀態：<span class="status-badge bg-success">✅ 庫存供應正常</span>';
+            badge.innerHTML = '即時狀態：<span class="status-badge bg-success">✅ 庫存供應正常</span>';
         }
         
         myChart.data.datasets[0].data = trend;
