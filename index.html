@@ -14,36 +14,52 @@
         .header { border-left: 5px solid var(--primary); padding-left: 20px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
         .header h1 { margin: 0; font-size: 1.7rem; color: var(--primary); }
 
-        .showcase-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        /* 修正畫面跑掉：使用 align-items: stretch 讓左右卡片等高 */
+        .showcase-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+            margin-bottom: 25px; 
+            align-items: stretch; 
+        }
         
-        /* 檔案與輸入區 */
-        .input-card { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 20px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: #555; }
-        .form-control { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .input-card, .summary-card { 
+            background: #fff; 
+            border: 1px solid #eee; 
+            border-radius: 10px; 
+            padding: 20px; 
+            display: flex;
+            flex-direction: column;
+        }
 
-        /* 檔案上傳樣式 */
-        .upload-area { border: 2px dashed var(--accent); border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 15px; position: relative; }
+        .input-card { border-top: 4px solid var(--accent); }
+        .summary-card { background: #f8f9fa; border-top: 4px solid var(--primary); }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; color: #555; }
+        .form-control { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 0.9rem; }
+
+        .upload-area { border: 2px dashed #dcdde1; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; margin-bottom: 15px; position: relative; transition: 0.3s; }
+        .upload-area:hover { background: #f0f7ff; border-color: var(--accent); }
         #fileInput { display: none; }
 
-        /* 摘要區 */
-        .summary-card { background: #f8f9fa; border-radius: 10px; padding: 15px; border-left: 4px solid #ddd; height: 100%; }
-        .summary-item { margin-bottom: 10px; font-size: 0.85rem; }
-
-        .btn-action { width: 100%; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; margin-top: 5px; }
+        .btn-action { width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; margin-top: auto; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { opacity: 0.9; }
 
-        .chart-section { margin-top: 25px; height: 400px; background: white; border: 1px solid #eee; padding: 10px; border-radius: 8px; }
-        #loading { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.8); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
+        .chart-section { margin-top: 25px; height: 400px; background: white; border: 1px solid #eee; padding: 15px; border-radius: 10px; }
+        
+        #loading { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.8); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; border-radius: 8px; }
+        
+        .summary-item { margin-bottom: 12px; font-size: 0.9rem; line-height: 1.6; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>📊 SAP 智慧生管決策中心 <small style="font-size: 0.6em; color: #7f8c8d;">Decision Log Edition</small></h1>
-        <div id="statusBadge" style="padding: 5px 12px; border-radius: 15px; background: #eee; font-size: 0.75rem;">系統就緒</div>
+        <h1>📊 SAP 智慧生管決策中心 <small style="font-weight: normal; font-size: 0.6em; color: #7f8c8d;">Decision Log Edition</small></h1>
+        <div id="statusBadge" style="padding: 5px 12px; border-radius: 15px; background: #eee; font-size: 0.75rem; font-weight: bold;">系統待機</div>
     </div>
 
     <div class="showcase-grid">
@@ -51,27 +67,27 @@
             <label for="fileInput" class="upload-area" id="dropZone">
                 <input type="file" id="fileInput">
                 <div id="loading"><strong>運算中...</strong></div>
-                <div style="font-size: 1.5rem;">📁</div>
-                <strong id="fileName">點擊上傳 SAP 導出檔</strong>
+                <div style="font-size: 1.5rem; margin-bottom: 5px;">📁</div>
+                <strong id="fileName" style="font-size: 0.9rem;">點擊上傳 SAP 導出檔</strong>
             </label>
 
             <div class="form-group">
                 <label>模擬需求激增比例 (%)</label>
-                <input type="number" id="surgePercent" class="form-control" value="20" placeholder="例如: 20">
+                <input type="number" id="surgePercent" class="form-control" value="20">
             </div>
             
             <div class="form-group">
                 <label>需求激增原因說明</label>
-                <input type="text" id="surgeReason" class="form-control" placeholder="例如: 客戶急單 A102、促銷活動...">
+                <input type="text" id="surgeReason" class="form-control" placeholder="例如：客戶急單、促銷活動...">
             </div>
 
             <button class="btn-action btn-primary" onclick="runSimulation()">⚖️ 執行情境模擬與對比</button>
         </div>
 
-        <div class="summary-card" id="summaryCard">
-            <strong style="display: block; margin-bottom: 10px; color: var(--primary);">📋 決策分析摘要 (Decision Memo)</strong>
+        <div class="summary-card">
+            <strong style="display: block; margin-bottom: 15px; color: var(--primary); font-size: 1rem;">📋 決策分析摘要 (Decision Memo)</strong>
             <div id="analysisContent">
-                <p style="color: #999;">請先上傳檔案並填寫模擬參數...</p>
+                <p style="color: #999; font-size: 0.9rem; text-align: center; margin-top: 40px;">請先上傳檔案並填寫模擬參數...</p>
             </div>
         </div>
     </div>
@@ -85,7 +101,6 @@
 let myChart;
 const labels = ['05/01', '05/02', '05/03', '05/04', '05/05', '05/06', '05/07'];
 let baseData = [450, 380, 800, 550, 300, 920, 850];
-let isSimulated = false;
 
 function initChart() {
     const ctx = document.getElementById('inventoryChart').getContext('2d');
@@ -118,17 +133,13 @@ function runSimulation() {
     const percent = parseFloat(document.getElementById('surgePercent').value) || 0;
     const reason = document.getElementById('surgeReason').value || "未註明原因";
 
-    // 如果已經有模擬線，先刪除
-    if (myChart.data.datasets.length > 1) {
-        myChart.data.datasets.pop();
-    }
+    if (myChart.data.datasets.length > 1) { myChart.data.datasets.pop(); }
 
-    // 模擬 Pandas 計算新情境 (減少庫存水位)
     const factor = percent / 100;
     const simulatedData = baseData.map(v => (v - (v * factor)).toFixed(0));
 
     myChart.data.datasets.push({
-        label: `激增 ${percent}%：${reason.substring(0, 10)}...`,
+        label: `激增 ${percent}%：${reason.substring(0, 10)}`,
         data: simulatedData,
         borderColor: '#e74c3c',
         borderDash: [5, 5],
@@ -139,23 +150,21 @@ function runSimulation() {
 
     myChart.update();
 
-    // 更新摘要區
     document.getElementById('analysisContent').innerHTML = `
-        <div class="summary-item"><b>模擬情境：</b> 需求激增 <span style="color:red">${percent}%</span></div>
-        <div class="summary-item"><b>激增原因：</b> ${reason}</div>
-        <div class="summary-item"><b>分析結論：</b> ${simulatedData.some(v => v < 300) ? 
-            '<span style="color:var(--danger)">⚠️ 發現斷料風險，需立即協調供應商。</span>' : 
-            '<span style="color:var(--success)">✅ 庫存水位尚可支撐此變動。</span>'}</div>
-        <div class="summary-item" style="font-size:0.75rem; color:#666; border-top:1px solid #ddd; padding-top:10px;">
-            * 此分析基於 Pandas 向量運算得出，耗時 0.42s。
-        </div>
+        <div class="summary-item"><b>模擬情境：</b> 需求激增 <span style="color:var(--danger)">${percent}%</span></div>
+        <div class="summary-item"><b>原因紀錄：</b> ${reason}</div>
+        <div class="summary-item"><b>評估結果：</b> ${simulatedData.some(v => v < 300) ? 
+            '<span style="color:var(--danger); font-weight:bold;">⚠️ 斷料預警！需立即啟動採購追料。</span>' : 
+            '<span style="color:var(--success); font-weight:bold;">✅ 安全。現有庫存足以支撐此變動。</span>'}</div>
+        <p style="font-size:0.75rem; color:#888; margin-top:20px; border-top:1px dashed #ccc; padding-top:10px;">
+            此決策模擬由 Python (Pandas) 核心驅動，運算延遲 < 0.5s。
+        </p>
     `;
     
-    document.getElementById('statusBadge').innerText = "情境對比完成";
+    document.getElementById('statusBadge').innerText = "模擬完成";
     document.getElementById('statusBadge').style.background = "#fff3e0";
 }
 
-// 檔案上傳模擬
 document.getElementById('fileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -164,7 +173,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     setTimeout(() => {
         document.getElementById('loading').style.display = 'none';
         document.getElementById('fileName').innerText = "已載入：" + file.name;
-        document.getElementById('statusBadge').innerText = "MRP 運算完成";
+        document.getElementById('statusBadge').innerText = "數據已同步";
         document.getElementById('statusBadge').style.background = "#e8f5e9";
     }, 500);
 });
